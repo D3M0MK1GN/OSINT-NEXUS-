@@ -41,6 +41,14 @@ export class DatabaseStorage implements IStorage {
       return await db.select().from(personasCasos).where(ilike(personasCasos.expediente, term));
     } else if (tipo === "pseudonimo") {
       return await db.select().from(personasCasos).where(ilike(personasCasos.pseudonimo, term));
+    } else if (tipo === "telefono") {
+      const telefonos = await db.select().from(personaTelefonos).where(ilike(personaTelefonos.numero, term));
+      if (telefonos.length === 0) return [];
+      const personaIds = telefonos.map(t => t.personaId).filter(Boolean) as number[];
+      if (personaIds.length === 0) return [];
+      return await db.select().from(personasCasos).where(
+        or(...personaIds.map(id => eq(personasCasos.nro, id)))
+      );
     }
     return await db.select().from(personasCasos);
   }
