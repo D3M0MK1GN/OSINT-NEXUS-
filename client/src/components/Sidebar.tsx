@@ -15,7 +15,6 @@ import { cn } from "@/lib/utils";
 const NAV_ITEMS = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/" },
   { icon: Search, label: "Trazabilidad", href: "/trazabilidad" },
-  { icon: Database, label: "Bases de Datos", href: "/bases-datos" },
   { icon: FileText, label: "Informes", href: "/informes" },
   { icon: ShieldAlert, label: "Alertas", href: "/alertas" },
   { icon: Settings, label: "Configuración", href: "/configuracion" },

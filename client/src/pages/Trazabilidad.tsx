@@ -3,12 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Search, Loader2, Info, FileText, Network, Share2 } from "lucide-react";
+import { Search, Loader2, Info, FileText, Network, Share2, Upload } from "lucide-react";
 import { useState } from "react";
 import { useBuscarPersonas } from "@/hooks/use-trazabilidad";
 import { PersonaModal } from "@/components/modals/PersonaModal";
 import { RegistrosModal } from "@/components/modals/RegistrosModal";
 import { AnalisisModal } from "@/components/modals/AnalisisModal";
+import { UploadModal } from "@/components/modals/UploadModal";
 import { type PersonaCaso } from "@shared/schema";
 
 export default function Trazabilidad() {
@@ -18,6 +19,7 @@ export default function Trazabilidad() {
   // Modal states
   const [selectedPersona, setSelectedPersona] = useState<PersonaCaso | null>(null);
   const [modalType, setModalType] = useState<"info" | "registros" | "analisis" | null>(null);
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
 
   const { data, isLoading, error, refetch } = useBuscarPersonas(activeSearch.tipo, activeSearch.valor);
 
@@ -38,11 +40,18 @@ export default function Trazabilidad() {
       <main className="flex-1 overflow-y-auto p-4 md:p-8">
         <div className="max-w-7xl mx-auto space-y-6">
           
-          <div className="flex justify-between items-end">
+          <div className="flex justify-between items-center">
             <div>
               <h1 className="text-2xl font-bold text-foreground">Módulo de Trazabilidad</h1>
               <p className="text-muted-foreground text-sm">Búsqueda y análisis de objetivos</p>
             </div>
+            <Button 
+              onClick={() => setIsUploadOpen(true)}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              <Upload className="w-4 h-4 mr-2" />
+              Cargar Datos
+            </Button>
           </div>
 
           {/* Search Card */}
@@ -168,6 +177,10 @@ export default function Trazabilidad() {
       </main>
 
       {/* Modals */}
+      <UploadModal 
+        isOpen={isUploadOpen} 
+        onClose={() => setIsUploadOpen(false)} 
+      />
       {selectedPersona && (
         <>
           <PersonaModal 
