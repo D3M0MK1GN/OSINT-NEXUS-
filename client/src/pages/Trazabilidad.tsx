@@ -9,7 +9,7 @@ import { useBuscarPersonas } from "@/hooks/use-trazabilidad";
 import { PersonaModal } from "@/components/modals/PersonaModal";
 import { RegistrosModal } from "@/components/modals/RegistrosModal";
 import { AnalisisModal } from "@/components/modals/AnalisisModal";
-import { UploadModal } from "@/components/modals/UploadModal";
+import { CargarDatosModal } from "@/components/modals/CargarDatosModal";
 import { type PersonaCaso } from "@shared/schema";
 
 export default function Trazabilidad() {
@@ -177,9 +177,10 @@ export default function Trazabilidad() {
       </main>
 
       {/* Modals */}
-      <UploadModal 
-        isOpen={isUploadOpen} 
-        onClose={() => setIsUploadOpen(false)} 
+      <CargarDatosModal 
+        open={isUploadOpen} 
+        onOpenChange={setIsUploadOpen} 
+        onSuccess={() => refetch()}
       />
       {selectedPersona && (
         <>
@@ -203,6 +204,7 @@ export default function Trazabilidad() {
     </div>
   );
 }
+
 
 function Database(props: any) {
   return (

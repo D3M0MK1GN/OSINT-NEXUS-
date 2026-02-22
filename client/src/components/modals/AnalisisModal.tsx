@@ -1,21 +1,19 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Maximize2, Minimize2, Loader2, RefreshCw } from "lucide-react";
-import { type PersonaCaso } from "@shared/schema";
 import { useAnalisisGrafo } from "@/hooks/use-trazabilidad";
 import CytoscapeComponent from "react-cytoscapejs";
 import { useState, useMemo } from "react";
-import cytoscape from "cytoscape";
 
 interface AnalisisModalProps {
   isOpen: boolean;
   onClose: () => void;
-  persona: PersonaCaso;
+  persona: any;
 }
 
 export function AnalisisModal({ isOpen, onClose, persona }: AnalisisModalProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const targetNumber = persona.telefono || persona.numeroAsociado;
+  const targetNumber = persona.numeroAsociado || (persona.telefonos && persona.telefonos.length > 0 ? persona.telefonos[0].numero : null);
   
   const { data: graphData, isLoading, refetch } = useAnalisisGrafo(targetNumber);
 
@@ -88,11 +86,11 @@ export function AnalisisModal({ isOpen, onClose, persona }: AnalisisModalProps) 
     if (!graphData) return [];
     
     // Ensure nodes are unique
-    const nodes = graphData.nodes.map((n: any) => ({
+    const nodes = (graphData as any).nodes.map((n: any) => ({
       data: { ...n.data, id: String(n.data.id) }
     }));
     
-    const edges = graphData.edges.map((e: any, i: number) => ({
+    const edges = (graphData as any).edges.map((e: any, i: number) => ({
       data: { ...e.data, id: `e${i}`, source: String(e.data.source), target: String(e.data.target) }
     }));
 
@@ -108,11 +106,11 @@ export function AnalisisModal({ isOpen, onClose, persona }: AnalisisModalProps) 
               <DialogTitle className="text-xl flex items-center gap-2">
                 Análisis de Vínculos
               </DialogTitle>
-              <DialogDescription>
-                Visualización gráfica de conexiones para: {persona.nombreCompleto}
+              <DialogDescription className="text-muted-foreground">
+                Visualización gráfica de conexiones para: <span className="text-primary font-mono">{persona.nombre} {persona.apellido || ''}</span>
               </DialogDescription>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 mr-8">
               <Button size="icon" variant="outline" onClick={() => refetch()} title="Recargar Grafo">
                 <RefreshCw className="w-4 h-4" />
               </Button>
@@ -149,9 +147,8 @@ export function AnalisisModal({ isOpen, onClose, persona }: AnalisisModalProps) 
             />
           )}
           
-          {/* Legend Overlay */}
-          <div className="absolute bottom-4 left-4 bg-card/90 border border-border p-3 rounded-lg shadow-lg backdrop-blur text-xs space-y-2 pointer-events-none">
-            <div className="font-semibold mb-1">Leyenda</div>
+          <div className="absolute bottom-4 left-4 bg-card/90 border border-border p-3 rounded-lg shadow-lg backdrop-blur text-[10px] space-y-2 pointer-events-none">
+            <div className="font-bold uppercase tracking-wider mb-1 text-primary">Leyenda</div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-sky-500 border border-sky-600"></div>
               <span>Objetivo Principal</span>

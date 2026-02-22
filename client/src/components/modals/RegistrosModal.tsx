@@ -1,26 +1,24 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { type PersonaCaso } from "@shared/schema";
 import { useRegistrosComunicacion } from "@/hooks/use-trazabilidad";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Loader2, Download, PhoneIncoming, PhoneOutgoing } from "lucide-react";
-import { format } from "date-fns";
 
 interface RegistrosModalProps {
   isOpen: boolean;
   onClose: () => void;
-  persona: PersonaCaso;
+  persona: any;
 }
 
 export function RegistrosModal({ isOpen, onClose, persona }: RegistrosModalProps) {
-  const { data: registros, isLoading } = useRegistrosComunicacion(persona.telefono || persona.numeroAsociado);
+  const targetNumber = persona.numeroAsociado || (persona.telefonos && persona.telefonos.length > 0 ? persona.telefonos[0].numero : null);
+  const { data: registros, isLoading } = useRegistrosComunicacion(targetNumber);
 
   const handleExport = () => {
     if (!registros) return;
     
-    // Simple CSV export logic
     const headers = ["Fecha", "Hora", "Origen", "Destino", "Duración (s)", "Tipo", "Ubicación"];
-    const rows = registros.map(r => [
+    const rows = (registros as any[]).map((r: any) => [
       r.fecha,
       r.hora,
       r.abonadoA,
@@ -32,14 +30,15 @@ export function RegistrosModal({ isOpen, onClose, persona }: RegistrosModalProps
 
     const csvContent = "data:text/csv;charset=utf-8," 
       + headers.join(",") + "\n" 
-      + rows.map(e => e.join(",")).join("\n");
+      + rows.map((e: any[]) => e.join(",")).join("\n");
 
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `registros_${persona.cedula}.csv`);
+    link.setAttribute("download", `registros_${persona.cedula || 'export'}.csv`);
     document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -51,29 +50,29 @@ export function RegistrosModal({ isOpen, onClose, persona }: RegistrosModalProps
               <DialogTitle className="flex items-center gap-2 text-xl">
                 Registros de Comunicación
               </DialogTitle>
-              <DialogDescription>
-                Historial de llamadas y mensajes para el objetivo: <span className="text-primary font-mono">{persona.nombreCompleto}</span>
+              <DialogDescription className="text-muted-foreground">
+                Historial de llamadas y mensajes para el objetivo: <span className="text-primary font-mono font-bold">{persona.nombre} {persona.apellido || ''}</span>
               </DialogDescription>
             </div>
-            <Button size="sm" variant="outline" onClick={handleExport} disabled={!registros?.length}>
+            <Button size="sm" variant="outline" onClick={handleExport} disabled={!registros || (registros as any[]).length === 0}>
               <Download className="w-4 h-4 mr-2" />
               Exportar CSV
             </Button>
           </div>
         </DialogHeader>
 
-        <div className="flex-1 overflow-auto border rounded-md mt-4">
+        <div className="flex-1 overflow-auto border rounded-md mt-4 bg-background/50">
           {isLoading ? (
             <div className="h-full flex items-center justify-center">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
-          ) : !registros || registros.length === 0 ? (
-            <div className="h-full flex items-center justify-center text-muted-foreground">
+          ) : !registros || (registros as any[]).length === 0 ? (
+            <div className="h-full flex items-center justify-center text-muted-foreground italic">
               No se encontraron registros de comunicación para este número.
             </div>
           ) : (
             <Table>
-              <TableHeader className="bg-secondary sticky top-0">
+              <TableHeader className="bg-secondary sticky top-0 z-10">
                 <TableRow>
                   <TableHead className="w-[100px]">Fecha</TableHead>
                   <TableHead className="w-[80px]">Hora</TableHead>
@@ -85,21 +84,21 @@ export function RegistrosModal({ isOpen, onClose, persona }: RegistrosModalProps
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {registros.map((registro, idx) => (
-                  <TableRow key={idx} className="hover:bg-muted/50">
+                {(registros as any[]).map((registro: any, idx: number) => (
+                  <TableRow key={idx} className="hover:bg-muted/50 transition-colors">
                     <TableCell className="font-mono text-xs">{registro.fecha}</TableCell>
                     <TableCell className="font-mono text-xs">{registro.hora}</TableCell>
                     <TableCell>
-                      {registro.tipoYTransaccion?.includes('Saliente') ? (
-                        <span className="flex items-center text-xs text-blue-400 gap-1"><PhoneOutgoing className="w-3 h-3"/> Saliente</span>
+                      {registro.tipoYTransaccion?.toLowerCase().includes('saliente') ? (
+                        <span className="flex items-center text-[10px] uppercase font-bold text-blue-400 gap-1"><PhoneOutgoing className="w-3 h-3"/> Saliente</span>
                       ) : (
-                        <span className="flex items-center text-xs text-green-400 gap-1"><PhoneIncoming className="w-3 h-3"/> Entrante</span>
+                        <span className="flex items-center text-[10px] uppercase font-bold text-emerald-400 gap-1"><PhoneIncoming className="w-3 h-3"/> Entrante</span>
                       )}
                     </TableCell>
                     <TableCell className="font-mono text-xs">{registro.abonadoA}</TableCell>
                     <TableCell className="font-mono text-xs">{registro.abonadoB}</TableCell>
                     <TableCell className="text-right font-mono text-xs">{registro.segundos}s</TableCell>
-                    <TableCell className="text-xs truncate max-w-[200px]" title={registro.direccionInicialA || ''}>
+                    <TableCell className="text-xs truncate max-w-[200px] text-muted-foreground" title={registro.direccionInicialA || ''}>
                       {registro.direccionInicialA || 'N/A'}
                     </TableCell>
                   </TableRow>

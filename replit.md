@@ -3,6 +3,14 @@
 ## Overview
 A criminal intelligence system (Sistema de Inteligencia Criminal) built with a full-stack TypeScript architecture. It provides case management, traceability analysis, database management, reports, and alerts for criminal investigations.
 
+## Recent Changes
+- Updated `CargarDatosModal` with a tabbed interface (Datos vs Archivo) for better UX.
+- Fixed type errors and property name mismatches in `RegistrosModal` and `AnalisisModal`.
+- Enhanced `PersonaModal` with organized sections for personal and case data.
+- Standardized modal styling and added theme-consistent backgrounds and borders.
+- Fixed accessibility warnings related to `DialogDescription` in all modals.
+- Cleaned up unused components and fixed Lucide icon imports.
+
 ## Project Architecture
 - **Frontend**: React 18 + Vite + TypeScript + Tailwind CSS + shadcn/ui components
 - **Backend**: Express 5 (TypeScript) serving both API and frontend
