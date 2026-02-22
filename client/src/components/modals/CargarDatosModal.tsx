@@ -28,11 +28,20 @@ import {
   ChevronLeft,
   CheckCircle2,
   Info,
+  Phone,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface CargarDatosModalProps {
   open: boolean;
@@ -47,8 +56,14 @@ const personaCasoSchema = z.object({
     .refine((val) => {
       if (!val || val.trim() === "") return true;
       const numeros = val.replace(/\D/g, "");
-      return numeros.length === 10;
-    }, "El teléfono debe tener exactamente 10 dígitos"),
+      return numeros.length >= 10;
+    }, "El teléfono debe tener al menos 10 dígitos"),
+  tipoTelefono: z.string().optional(),
+  lineaTelefono: z.string().optional(),
+  statusTelefono: z.string().optional(),
+  alertaTelefono: z.string().optional(),
+  imei1: z.string().optional(),
+  imei2: z.string().optional(),
   cedula: z.string().min(1, "La cédula es requerida"),
   nombre: z.string().min(1, "El nombre es requerido"),
   apellido: z.string().optional(),
@@ -79,11 +94,18 @@ export function CargarDatosModal({
   const [opcionSeleccionada, setOpcionSeleccionada] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [archivo, setArchivo] = useState<File | null>(null);
+  const [showTelefonoForm, setShowTelefonoForm] = useState(false);
 
   const form = useForm<PersonaCasoFormData>({
     resolver: zodResolver(personaCasoSchema),
     defaultValues: {
       telefono: "",
+      tipoTelefono: "Móvil",
+      lineaTelefono: "Digitel",
+      statusTelefono: "Activa",
+      alertaTelefono: "Ninguna",
+      imei1: "",
+      imei2: "",
       cedula: "",
       nombre: "",
       apellido: "",
@@ -105,6 +127,7 @@ export function CargarDatosModal({
   const handleReset = () => {
     setOpcionSeleccionada(null);
     setArchivo(null);
+    setShowTelefonoForm(false);
     form.reset();
   };
 
@@ -305,13 +328,124 @@ export function CargarDatosModal({
           <FormMessage />
         </FormItem>
       )} />
-      <FormField control={form.control} name="telefono" render={({ field }) => (
-        <FormItem>
-          <FormLabel>Teléfono Principal</FormLabel>
-          <FormControl><Input {...field} placeholder="4121234567" maxLength={10} className="bg-background border-input" onChange={(e) => field.onChange(e.target.value.replace(/\D/g, ""))}/></FormControl>
-          <FormMessage />
-        </FormItem>
-      )} />
+      <div className="col-span-2">
+        <Button 
+          type="button" 
+          variant="outline" 
+          className="w-full flex justify-between items-center group"
+          onClick={() => setShowTelefonoForm(!showTelefonoForm)}
+        >
+          <span className="flex items-center gap-2">
+            <Phone className="w-4 h-4 text-primary" />
+            {form.getValues("telefono") ? `Teléfono: ${form.getValues("telefono")}` : "Agregar Teléfono Principal"}
+          </span>
+          <ChevronRight className={`w-4 h-4 transition-transform ${showTelefonoForm ? 'rotate-90' : ''}`} />
+        </Button>
+
+        {showTelefonoForm && (
+          <Card className="mt-2 border-primary/20 bg-primary/5">
+            <CardContent className="p-4 grid grid-cols-2 gap-4">
+              <FormField control={form.control} name="telefono" render={({ field }) => (
+                <FormItem className="col-span-2">
+                  <FormLabel>Número</FormLabel>
+                  <FormControl><Input {...field} placeholder="4121234567" className="bg-background" /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )} />
+              
+              <FormField control={form.control} name="tipoTelefono" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tipo</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="bg-background">
+                        <SelectValue placeholder="Tipo" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Móvil">Móvil</SelectItem>
+                      <SelectItem value="Fijo">Fijo</SelectItem>
+                      <SelectItem value="Extranjero">Extranjero</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )} />
+
+              <FormField control={form.control} name="lineaTelefono" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Línea</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="bg-background">
+                        <SelectValue placeholder="Línea" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Digitel">Digitel</SelectItem>
+                      <SelectItem value="Movistar">Movistar</SelectItem>
+                      <SelectItem value="Movilnet">Movilnet</SelectItem>
+                      <SelectItem value="Cantv">Cantv</SelectItem>
+                      <SelectItem value="Otro">Otro</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )} />
+
+              <FormField control={form.control} name="statusTelefono" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="bg-background">
+                        <SelectValue placeholder="Status" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Activa">Activa</SelectItem>
+                      <SelectItem value="Desactiva">Desactiva</SelectItem>
+                      <SelectItem value="Cortada">Cortada</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )} />
+
+              <FormField control={form.control} name="alertaTelefono" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Alerta</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="bg-background">
+                        <SelectValue placeholder="Alerta" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Ninguna">Ninguna</SelectItem>
+                      <SelectItem value="Spam">Spam</SelectItem>
+                      <SelectItem value="Investigada">Investigada</SelectItem>
+                      <SelectItem value="Victima">Víctima</SelectItem>
+                      <SelectItem value="Critica">Crítica</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )} />
+
+              <FormField control={form.control} name="imei1" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>IMEI 1</FormLabel>
+                  <FormControl><Input {...field} className="bg-background" /></FormControl>
+                </FormItem>
+              )} />
+
+              <FormField control={form.control} name="imei2" render={({ field }) => (
+                <FormItem>
+                  <FormLabel>IMEI 2</FormLabel>
+                  <FormControl><Input {...field} className="bg-background" /></FormControl>
+                </FormItem>
+              )} />
+            </CardContent>
+          </Card>
+        )}
+      </div>
       <FormField control={form.control} name="pseudonimo" render={({ field }) => (
         <FormItem>
           <FormLabel>Seudónimo</FormLabel>
@@ -433,50 +567,54 @@ export function CargarDatosModal({
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => { if(!isOpen) handleReset(); onOpenChange(isOpen); }}>
-      <DialogContent className="max-w-3xl bg-card border-border text-foreground max-h-[90vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold flex items-center gap-2">
-            {opcionSeleccionada ? (
-              <Button variant="ghost" size="icon" onClick={() => setOpcionSeleccionada(null)} className="h-8 w-8 text-foreground"><ChevronLeft className="h-4 w-4" /></Button>
-            ) : null}
-            Carga de Datos de Inteligencia
-          </DialogTitle>
-          <DialogDescription className="text-muted-foreground">Complete los campos requeridos para ingresar información al sistema.</DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-w-3xl bg-card border-border text-foreground h-[90vh] flex flex-col p-0">
+        <div className="p-6 pb-0">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold flex items-center gap-2">
+              {opcionSeleccionada ? (
+                <Button variant="ghost" size="icon" onClick={() => setOpcionSeleccionada(null)} className="h-8 w-8 text-foreground"><ChevronLeft className="h-4 w-4" /></Button>
+              ) : null}
+              Carga de Datos de Inteligencia
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground">Complete los campos requeridos para ingresar información al sistema.</DialogDescription>
+          </DialogHeader>
+        </div>
 
-        {!opcionSeleccionada ? renderSeleccionOpcion() : (
-          <ScrollArea className="flex-1 -mr-4 pr-4">
-            {opcionSeleccionada === 1 ? (
-              <Tabs defaultValue="datos" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="datos">1. Datos del Objetivo</TabsTrigger>
-                  <TabsTrigger value="archivo">2. Archivo de Registros</TabsTrigger>
-                </TabsList>
-                <Form {...form}>
-                  <TabsContent value="datos">{renderFormularioPersona()}</TabsContent>
-                  <TabsContent value="archivo">{renderImportarArchivo()}</TabsContent>
-                </Form>
-                <div className="flex justify-end gap-3 pt-6 border-t border-border sticky bottom-0 bg-card py-4">
-                  <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-                  <Button onClick={form.handleSubmit(handleGuardarCasoCompleto)} disabled={isLoading} className="bg-primary text-primary-foreground">
-                    {isLoading ? "Guardando..." : "Guardar Caso Completo"}
-                  </Button>
+        <div className="flex-1 overflow-y-auto p-6 pt-2">
+          {!opcionSeleccionada ? renderSeleccionOpcion() : (
+            <div className="flex-1">
+              {opcionSeleccionada === 1 ? (
+                <Tabs defaultValue="datos" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="datos">1. Datos del Objetivo</TabsTrigger>
+                    <TabsTrigger value="archivo">2. Archivo de Registros</TabsTrigger>
+                  </TabsList>
+                  <Form {...form}>
+                    <TabsContent value="datos">{renderFormularioPersona()}</TabsContent>
+                    <TabsContent value="archivo">{renderImportarArchivo()}</TabsContent>
+                  </Form>
+                  <div className="flex justify-end gap-3 pt-6 border-t border-border sticky bottom-0 bg-card py-4 z-10">
+                    <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+                    <Button onClick={form.handleSubmit(handleGuardarCasoCompleto)} disabled={isLoading} className="bg-primary text-primary-foreground">
+                      {isLoading ? "Guardando..." : "Guardar Caso Completo"}
+                    </Button>
+                  </div>
+                </Tabs>
+              ) : (
+                <div className="space-y-6 py-4">
+                  <div className="flex items-center gap-2"><div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">!</div><span className="font-medium text-lg">Importación Directa de Registros</span></div>
+                  {renderImportarArchivo(true)}
+                  <div className="flex justify-end gap-3 pt-4 border-t border-border sticky bottom-0 bg-card py-4 z-10">
+                    <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+                    <Button onClick={handleImportarRegistros} disabled={isLoading || !archivo} className="bg-primary text-primary-foreground">
+                      {isLoading ? "Importando..." : "Importar Registros"}
+                    </Button>
+                  </div>
                 </div>
-              </Tabs>
-            ) : (
-              <div className="space-y-6 py-4">
-                <div className="flex items-center gap-2"><div className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold">!</div><span className="font-medium text-lg">Importación Directa de Registros</span></div>
-                {renderImportarArchivo(true)}
-                <div className="flex justify-end gap-3 pt-4 border-t border-border">
-                  <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-                  <Button onClick={handleImportarRegistros} disabled={isLoading || !archivo} className="bg-primary text-primary-foreground">
-                    {isLoading ? "Importando..." : "Importar Registros"}
-                  </Button>
-                </div>
-              </div>
-            )}
-          </ScrollArea>
-        )}
+              )}
+            </div>
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   );

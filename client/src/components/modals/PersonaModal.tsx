@@ -12,18 +12,20 @@ interface PersonaModalProps {
 export function PersonaModal({ isOpen, onClose, persona }: PersonaModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] bg-card border-border text-foreground max-h-[90vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-xl">
-            <User className="w-5 h-5 text-primary" />
-            Información del Objetivo
-          </DialogTitle>
-          <DialogDescription className="text-muted-foreground">
-            Detalles completos del expediente seleccionado.
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="sm:max-w-[600px] bg-card border-border text-foreground h-[90vh] flex flex-col p-0">
+        <div className="p-6 pb-0">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-xl">
+              <User className="w-5 h-5 text-primary" />
+              Información del Objetivo
+            </DialogTitle>
+            <DialogDescription className="text-muted-foreground">
+              Detalles completos del expediente seleccionado.
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
-        <ScrollArea className="flex-1 pr-4">
+        <div className="flex-1 overflow-y-auto p-6 pt-2">
           <div className="grid gap-6 py-4">
             <section className="space-y-4">
               <h4 className="text-sm font-semibold text-primary flex items-center gap-2 border-b border-border pb-2">
@@ -155,7 +157,7 @@ export function PersonaModal({ isOpen, onClose, persona }: PersonaModalProps) {
               </div>
             </section>
           </div>
-        </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   );

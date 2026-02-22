@@ -8,6 +8,40 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
 
+  app.post("/api/personas-casos", async (req, res) => {
+    try {
+      const data = req.body;
+      const persona = await storage.createPersonaCaso(data);
+      if (data.telefono) {
+        await storage.createPersonaTelefono({
+          personaId: persona.nro,
+          numero: data.telefono,
+          tipo: data.tipoTelefono || "Móvil",
+          linea: data.lineaTelefono,
+          status: data.statusTelefono,
+          alerta: data.alertaTelefono,
+          imei1: data.imei1,
+          imei2: data.imei2,
+          iconoTipo: "phone",
+          activo: true
+        });
+      }
+      res.json(persona);
+    } catch (err) {
+      console.error("Error al crear persona:", err);
+      res.status(500).json({ message: "Error al crear persona" });
+    }
+  });
+
+  app.post("/api/registros-comunicacion/importar", async (req, res) => {
+    try {
+      // Mock import logic for now
+      res.json({ registrosImportados: 0 });
+    } catch (err) {
+      res.status(500).json({ message: "Error al importar registros" });
+    }
+  });
+
   app.get(api.trazabilidad.buscar.path, async (req, res) => {
     try {
       const tipo = String(req.query.tipo || 'cedula');

@@ -31,7 +31,12 @@ export const personaTelefonos = pgTable("persona_telefonos", {
   id: serial("id").primaryKey(),
   personaId: integer("persona_id").references(() => personasCasos.nro),
   numero: text("numero").notNull().unique(),
-  tipo: text("tipo"), // Móvil, Fijo, Trabajo, Satelital
+  tipo: text("tipo"), // Móvil, Fijo, Extranjero
+  linea: text("linea"), // Digitel, Movistar, Movilnet, Cantv, Otro
+  status: text("status"), // Activa, Desactiva, Cortada
+  alerta: text("alerta"), // Spam, Investigada, Victima, Critica
+  imei1: text("imei1"),
+  imei2: text("imei2"),
   iconoTipo: text("icono_tipo"),
   activo: boolean("activo").default(true),
   createdAt: timestamp("created_at").defaultNow(),
