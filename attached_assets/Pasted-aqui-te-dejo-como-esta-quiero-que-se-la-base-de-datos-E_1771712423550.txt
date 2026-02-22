@@ -1,0 +1,67 @@
+aqui te dejo como esta quiero que se la base de datos  ESTRUCTURA DE BASE DE DATOS - MÓDULO DE TRAZABILIDAD (TER-SYSTEM)
+==================================================================
+
+1. TABLA: personas_casos (PERSONA_CASO)
+---------------------------------------
+Descripción: Almacena los datos biográficos del investigado y la información general del caso judicial.
+
+Campos:
+- nro (serial, PK): Identificador único interno.
+- cedula (text, UNIQUE): Cédula de identidad del investigado.
+- nombre (text): Nombres de la persona.
+- apellido (text): Apellidos de la persona.
+- pseudonimo (text): Alias o apodos conocidos.
+- edad (integer): Edad al momento del registro.
+- fecha_de_nacimiento (text): Fecha de nacimiento.
+- profesion (text): Ocupación o profesión.
+- direccion (text): Dirección de habitación o domicilio.
+- expediente (text): Número de expediente judicial asociado.
+- fecha_de_inicio (text): Fecha de inicio de la investigación.
+- delito (text): Calificación jurídica del hecho.
+- n_oficio (text): Número de oficio de solicitud.
+- fiscalia (text): Fiscalía que conoce la causa.
+- descripcion (text): Detalles adicionales sobre el caso.
+- observacion (text): Notas adicionales del investigador.
+- usuario_id (integer): ID del usuario que registró el caso (Ref: users.id).
+- created_at (timestamp): Fecha de creación del registro.
+- updated_at (timestamp): Fecha de última actualización.
+
+2. TABLA: persona_telefonos (PERSONA_TELEFONOS)
+-----------------------------------------------
+Descripción: Catálogo de números telefónicos vinculados directamente a una persona.
+
+Campos:
+- id (serial, PK): Identificador único interno.
+- persona_id (integer): Vínculo con la tabla personas_casos (Ref: personas_casos.nro).
+- numero (text, UNIQUE): Número de teléfono (formato internacional o local).
+- tipo (text): Categoría (ej: Móvil, Fijo, Trabajo, Satelital).
+- icono_tipo (text): Identificador de icono para la visualización en el grafo.
+- activo (boolean): Estado del número (true/false).
+- created_at (timestamp): Fecha de registro del número.
+
+3. TABLA: registros_comunicacion (REGISTRO_COMUNICACION)
+-------------------------------------------------------
+Descripción: Almacena el historial de llamadas y mensajes extraídos de los archivos de operadoras.
+
+Campos:
+- registro_id (serial, PK): Identificador único de la comunicación.
+- abonado_a (text, NOT NULL): Número que origina la comunicación (o número objetivo).
+- abonado_b (text): Número que recibe la comunicación.
+- abonado_a_id (integer): FK opcional hacia persona_telefonos (si el número 'A' es conocido).
+- abonado_b_id (integer): FK opcional hacia persona_telefonos (si el número 'B' es conocido).
+- imei1_a / imei2_a (text): Identificadores de equipo (IMEI) del abonado A.
+- imei1_b / imei2_b (text): Identificadores de equipo (IMEI) del abonado B.
+- tipo_y_transaccion (text): Tipo de evento (ej: Llamada Saliente, SMS, Datos).
+- segundos (integer): Duración de la comunicación en segundos.
+- hora (text): Hora exacta del evento.
+- fecha (text): Fecha del evento.
+- direccion_inicial_a (text): Dirección física de la celda/antena donde inició el evento.
+- latitud_inicial_a (text): Coordenada de latitud de la antena.
+- longitud_inicial_a (text): Coordenada de longitud de la antena.
+- archivo (text): Nombre del archivo fuente de donde se extrajo el dato.
+- peso (text): Información adicional de carga o metadatos técnicos.
+- created_at (timestamp): Fecha en que se importó el registro al sistema.
+
+==================================================================
+Relación Técnica: 
+registros_comunicacion (números) <-> persona_telefonos (vínculo) <-> personas_casos (identidad)
