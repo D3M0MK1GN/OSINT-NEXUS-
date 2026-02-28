@@ -1,0 +1,438 @@
+{
+  "id": "6a97380f-c65c-41b3-a401-8dca7bf4688e",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.persona_telefonos": {
+      "name": "persona_telefonos",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "persona_id": {
+          "name": "persona_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "numero": {
+          "name": "numero",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tipo": {
+          "name": "tipo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "linea": {
+          "name": "linea",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "alerta": {
+          "name": "alerta",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "imei1": {
+          "name": "imei1",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "imei2": {
+          "name": "imei2",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "icono_tipo": {
+          "name": "icono_tipo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "activo": {
+          "name": "activo",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "persona_telefonos_persona_id_personas_casos_nro_fk": {
+          "name": "persona_telefonos_persona_id_personas_casos_nro_fk",
+          "tableFrom": "persona_telefonos",
+          "tableTo": "personas_casos",
+          "columnsFrom": [
+            "persona_id"
+          ],
+          "columnsTo": [
+            "nro"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "persona_telefonos_numero_unique": {
+          "name": "persona_telefonos_numero_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "numero"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.personas_casos": {
+      "name": "personas_casos",
+      "schema": "",
+      "columns": {
+        "nro": {
+          "name": "nro",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "cedula": {
+          "name": "cedula",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nombre": {
+          "name": "nombre",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "apellido": {
+          "name": "apellido",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "pseudonimo": {
+          "name": "pseudonimo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "edad": {
+          "name": "edad",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha_de_nacimiento": {
+          "name": "fecha_de_nacimiento",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "profesion": {
+          "name": "profesion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "direccion": {
+          "name": "direccion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "expediente": {
+          "name": "expediente",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha_de_inicio": {
+          "name": "fecha_de_inicio",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "delito": {
+          "name": "delito",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "n_oficio": {
+          "name": "n_oficio",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fiscalia": {
+          "name": "fiscalia",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "descripcion": {
+          "name": "descripcion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "observacion": {
+          "name": "observacion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "usuario_id": {
+          "name": "usuario_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "personas_casos_cedula_unique": {
+          "name": "personas_casos_cedula_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "cedula"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.registros_comunicacion": {
+      "name": "registros_comunicacion",
+      "schema": "",
+      "columns": {
+        "registro_id": {
+          "name": "registro_id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "abonado_a": {
+          "name": "abonado_a",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "abonado_b": {
+          "name": "abonado_b",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "abonado_a_id": {
+          "name": "abonado_a_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "abonado_b_id": {
+          "name": "abonado_b_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "imei1_a": {
+          "name": "imei1_a",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "imei2_a": {
+          "name": "imei2_a",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "imei1_b": {
+          "name": "imei1_b",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "imei2_b": {
+          "name": "imei2_b",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "tipo_y_transaccion": {
+          "name": "tipo_y_transaccion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "segundos": {
+          "name": "segundos",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hora": {
+          "name": "hora",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fecha": {
+          "name": "fecha",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "direccion_inicial_a": {
+          "name": "direccion_inicial_a",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "latitud_inicial_a": {
+          "name": "latitud_inicial_a",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "longitud_inicial_a": {
+          "name": "longitud_inicial_a",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "direccion_inicial_b": {
+          "name": "direccion_inicial_b",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "latitud_inicial_b": {
+          "name": "latitud_inicial_b",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "longitud_inicial_b": {
+          "name": "longitud_inicial_b",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "archivo": {
+          "name": "archivo",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "peso": {
+          "name": "peso",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "registros_comunicacion_abonado_a_id_persona_telefonos_id_fk": {
+          "name": "registros_comunicacion_abonado_a_id_persona_telefonos_id_fk",
+          "tableFrom": "registros_comunicacion",
+          "tableTo": "persona_telefonos",
+          "columnsFrom": [
+            "abonado_a_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "registros_comunicacion_abonado_b_id_persona_telefonos_id_fk": {
+          "name": "registros_comunicacion_abonado_b_id_persona_telefonos_id_fk",
+          "tableFrom": "registros_comunicacion",
+          "tableTo": "persona_telefonos",
+          "columnsFrom": [
+            "abonado_b_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
