@@ -1,7 +1,25 @@
-import type { Express } from "express";
-import type { Server } from "http";
+import multer from "multer";
 import { storage } from "./storage";
 import { api } from "@shared/routes";
+
+// Configuración de Multer para la subida de archivos
+const upload = multer({
+  storage: multer.memoryStorage(), // Almacena el archivo en memoria
+  fileFilter: (req, file, cb) => {
+    // Permitir solo archivos Excel
+    if (
+      file.mimetype === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" || // .xlsx
+      file.mimetype === "application/vnd.ms-excel" // .xls
+    ) {
+      cb(null, true);
+    } else {
+      cb(new Error("Tipo de archivo no válido. Solo se permiten archivos Excel (.xlsx, .xls)."), false);
+    }
+  },
+  limits: {
+    fileSize: 50 * 1024 * 1024, // Límite de 50MB
+  },
+});
 
 export async function registerRoutes(
   httpServer: Server,
@@ -11,20 +29,25 @@ export async function registerRoutes(
   app.post("/api/personas-casos", async (req, res) => {
     try {
       const data = req.body;
+      console.log("Datos recibidos en /api/personas-casos:", data);
       const persona = await storage.createPersonaCaso(data);
-      if (data.telefono) {
-        await storage.createPersonaTelefono({
-          personaId: persona.nro,
-          numero: data.telefono,
-          tipo: data.tipoTelefono || "Móvil",
-          linea: data.lineaTelefono,
-          status: data.statusTelefono,
-          alerta: data.alertaTelefono,
-          imei1: data.imei1,
-          imei2: data.imei2,
-          iconoTipo: "phone",
-          activo: true
-        });
+      if (data.telefonos && Array.isArray(data.telefonos)) {
+        console.log("Teléfonos recibidos para crear:", data.telefonos);
+        for (const telefonoData of data.telefonos) {
+          console.log("Creando teléfono:", telefonoData);
+          await storage.createPersonaTelefono({
+            personaId: persona.nro,
+            numero: telefonoData.numero,
+            tipo: telefonoData.tipo || "Móvil",
+            linea: telefonoData.linea,
+            status: telefonoData.status,
+            alerta: telefonoData.alerta,
+            imei1: telefonoData.imei1,
+            imei2: telefonoData.imei2,
+            iconoTipo: "phone",
+            activo: true
+          });
+        }
       }
       res.json(persona);
     } catch (err) {
@@ -33,12 +56,24 @@ export async function registerRoutes(
     }
   });
 
-  app.post("/api/registros-comunicacion/importar", async (req, res) => {
+  app.post("/api/registros-comunicacion/importar", upload.single("archivo"), async (req, res) => {
     try {
-      // Mock import logic for now
-      res.json({ registrosImportados: 0 });
-    } catch (err) {
-      res.status(500).json({ message: "Error al importar registros" });
+      if (!req.file) {
+        return res.status(400).json({ message: "No se ha subido ningún archivo." });
+      }
+
+      const archivoBuffer = req.file.buffer;
+      const numeroAsociado = req.body.numeroAsociado as string | undefined;
+
+      const registrosImportados = await storage.importRegistrosComunicacion(archivoBuffer, numeroAsociado);
+
+      res.json({ registrosImportados });
+    } catch (err: any) {
+      console.error("Error al importar registros:", err);
+      if (err.message === "Tipo de archivo no válido. Solo se permiten archivos Excel (.xlsx, .xls).") {
+        return res.status(400).json({ message: err.message });
+      }
+      res.status(500).json({ message: err.message || "Error al importar registros" });
     }
   });
 
@@ -46,9 +81,23 @@ export async function registerRoutes(
     try {
       const tipo = String(req.query.tipo || 'cedula');
       const valor = String(req.query.valor || '');
-      const resultados = await storage.buscarPersonasCasos(tipo, valor);
-      res.json({ resultados, total: resultados.length });
+      let resultados: any[] = [];
+      let total = 0;
+
+      if (tipo === "identificar_numero") {
+        resultados = await storage.buscarPersonaPorTelefono(valor);
+        total = resultados.length;
+      } else if (tipo === "registro_comunicacional") {
+        resultados = await storage.getRegistrosComunicacionPorAbonado(valor);
+        total = resultados.length;
+      } else {
+        // Búsquedas existentes por cedula, nombre, expediente, pseudonimo
+        resultados = await storage.buscarPersonasCasos(tipo, valor);
+        total = resultados.length;
+      }
+      res.json({ resultados, total });
     } catch (err) {
+      console.error("Error interno del servidor al buscar:", err);
       res.status(500).json({ message: "Error interno del servidor" });
     }
   });
